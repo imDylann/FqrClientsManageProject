@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class DataBaseConnection {
     
       private static final String URL = "jdbc:mysql://localhost:3306/FqrCLients";
-    private static final String USER = "DylanQuiros";
+    private static final String USER = "root";
     private static final String PASSWORD = "19-03-2005Dd";
 
     public static Connection getConnection() throws SQLException {

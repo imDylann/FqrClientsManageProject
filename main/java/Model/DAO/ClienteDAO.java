@@ -58,7 +58,7 @@ public class ClienteDAO {
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                int id = resultSet.getInt("cliente_id");
                 String nombre = resultSet.getString("nombre");
                 String direccion = resultSet.getString("direccion");
                 String telefono = resultSet.getString("telefono");
