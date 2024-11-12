@@ -42,7 +42,7 @@ public class CuentaDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                int id = resultSet.getInt("cuenta_id");
                 String tipoTransaccion = resultSet.getString("tipo_transaccion");
                 double monto = resultSet.getDouble("monto");
                 String descripcion = resultSet.getString("descripcion");
@@ -54,17 +54,18 @@ public class CuentaDAO {
     }
 
     // Método para actualizar una cuenta
-    public void actualizarCuenta(Cuenta cuenta) throws SQLException {
-        try (Connection connection = DataBaseConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CUENTA_SQL)) {
-            preparedStatement.setString(1, cuenta.getTipoTransaccion());
-            preparedStatement.setDouble(2, cuenta.getMonto());
-            preparedStatement.setString(3, cuenta.getDescripcion());
-            preparedStatement.setDate(4, new java.sql.Date(cuenta.getFecha().getTime()));
-            preparedStatement.setInt(5, cuenta.getId());
-            preparedStatement.executeUpdate();
-        }
+ public void actualizarMontoCuenta(int cuenta_id, double monto, String tipoTransaccion, String descripcion) throws SQLException {
+    String callProcedure = "{CALL ActualizarMontoCuenta(?, ?, ?, ?)}";
+    
+    try (Connection connection = DataBaseConnection.getConnection();
+         CallableStatement callableStatement = connection.prepareCall(callProcedure)) {
+        callableStatement.setInt(1, cuenta_id);
+        callableStatement.setDouble(2, monto);
+        callableStatement.setString(3, tipoTransaccion);
+        callableStatement.setString(4, descripcion);
+        callableStatement.execute();
     }
+}
 
     // Método para eliminar una cuenta
     public void eliminarCuenta(int cuentaId) throws SQLException {

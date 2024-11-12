@@ -16,9 +16,9 @@ import java.util.List;
 
 public class ClienteDAO {
     private static final String INSERT_CLIENTE_SQL = "INSERT INTO Clientes (nombre, direccion, telefono) VALUES (?, ?, ?)";
-    private static final String SELECT_CLIENTE_BY_ID = "SELECT * FROM Clientes WHERE id = ?";
+    private static final String SELECT_CLIENTE_BY_ID = "SELECT * FROM Clientes WHERE cliente_id  = ?";
     private static final String SELECT_ALL_CLIENTES = "SELECT * FROM Clientes";
-    private static final String UPDATE_CLIENTE_SQL = "UPDATE Clientes SET nombre = ?, direccion = ?, telefono = ? WHERE id = ?";
+    private static final String UPDATE_CLIENTE_SQL = "UPDATE Clientes SET nombre = ?, direccion = ?, telefono = ? WHERE cliente_id = ?";
     private static final String DELETE_CLIENTE_SQL = "DELETE FROM Clientes WHERE id = ?";
 
     // Método para insertar un nuevo cliente
