@@ -1,32 +1,33 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package View;
 
-/**
- *
- * @author PC
- */
 import DataBaseUntil.DataBaseConnection;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.time.LocalDate;
 
 public class AdministracionCuentas extends JInternalFrame {
     private JTable tablaCuentas;
-    private JTextField txtTipoTransaccion, txtMonto, txtDescripcion;
+    private JTextField txtMonto, txtDescripcion;
+    private JToggleButton btnDeposito, btnRetiro;
     private JButton btnAgregarCuenta, btnRealizarTransaccion;
     private int clienteIDSeleccionado;
 
-    public AdministracionCuentas(int clienteID) {
-        this.clienteIDSeleccionado = clienteID;
-
-        setTitle("Administración de Cuentas - Cliente ID: " + clienteID);
+    public AdministracionCuentas() {
+        setTitle("Administración de Cuentas");
         setSize(1320, 750);
         setLayout(new BorderLayout());
+
+        // Solicitar ID del cliente
+        clienteIDSeleccionado = solicitarClienteID();
+        if (clienteIDSeleccionado == -1) {
+            JOptionPane.showMessageDialog(this, "No se ingresó un ID de cliente válido.");
+            dispose();
+            return;
+        }
 
         // Panel superior: Información de la cuenta
         JPanel panelCuenta = new JPanel(new BorderLayout());
@@ -48,8 +49,24 @@ public class AdministracionCuentas extends JInternalFrame {
 
         JLabel lblTipoTransaccion = new JLabel("Tipo Transacción:");
         lblTipoTransaccion.setForeground(Color.WHITE);
-        txtTipoTransaccion = new JTextField();
 
+        // Botones JToggle para tipo de transacción
+        btnDeposito = new JToggleButton("Depósito");
+        btnDeposito.setBackground(new Color(85, 239, 196));
+        btnDeposito.setForeground(Color.BLACK);
+        btnDeposito.addItemListener(e -> btnRetiro.setSelected(false));
+
+        btnRetiro = new JToggleButton("Retiro");
+        btnRetiro.setBackground(new Color(255, 159, 67));
+        btnRetiro.setForeground(Color.BLACK);
+        btnRetiro.addItemListener(e -> btnDeposito.setSelected(false));
+
+        // Agrupar botones en un ButtonGroup para que solo uno esté seleccionado a la vez
+        ButtonGroup group = new ButtonGroup();
+        group.add(btnDeposito);
+        group.add(btnRetiro);
+
+        // TextField para monto y descripción
         JLabel lblMonto = new JLabel("Monto:");
         lblMonto.setForeground(Color.WHITE);
         txtMonto = new JTextField();
@@ -58,6 +75,7 @@ public class AdministracionCuentas extends JInternalFrame {
         lblDescripcion.setForeground(Color.WHITE);
         txtDescripcion = new JTextField();
 
+        // Botones para agregar cuenta y realizar transacción
         btnAgregarCuenta = new JButton("Agregar Cuenta");
         btnAgregarCuenta.setBackground(new Color(85, 239, 196));
         btnAgregarCuenta.setForeground(Color.BLACK);
@@ -68,8 +86,11 @@ public class AdministracionCuentas extends JInternalFrame {
         btnRealizarTransaccion.setForeground(Color.BLACK);
         btnRealizarTransaccion.addActionListener(e -> realizarTransaccion());
 
+        // Agregar componentes al formulario
         panelFormulario.add(lblTipoTransaccion);
-        panelFormulario.add(txtTipoTransaccion);
+        panelFormulario.add(new JPanel());  // Espacio vacío para alinear los botones
+        panelFormulario.add(btnDeposito);
+        panelFormulario.add(btnRetiro);
         panelFormulario.add(lblMonto);
         panelFormulario.add(txtMonto);
         panelFormulario.add(lblDescripcion);
@@ -86,6 +107,15 @@ public class AdministracionCuentas extends JInternalFrame {
         cargarCuentasCliente();
     }
 
+    private int solicitarClienteID() {
+        String input = JOptionPane.showInputDialog(this, "Ingrese el ID del cliente:");
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            return -1; // ID inválido
+        }
+    }
+
     private void cargarCuentasCliente() {
         DefaultTableModel modelo = (DefaultTableModel) tablaCuentas.getModel();
         modelo.setRowCount(0);
@@ -97,12 +127,12 @@ public class AdministracionCuentas extends JInternalFrame {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                modelo.addRow(new Object[]{
-                        rs.getInt("cuenta_id"),
-                        rs.getString("tipo_transaccion"),
-                        rs.getDouble("monto"),
-                        rs.getDate("fecha"),
-                        rs.getString("descripcion")
+                modelo.addRow(new Object[] {
+                    rs.getInt("cuenta_id"),
+                    rs.getString("tipo_transaccion"),
+                    rs.getDouble("monto"),
+                    rs.getDate("fecha"),
+                    rs.getString("descripcion")
                 });
             }
         } catch (SQLException e) {
@@ -111,17 +141,24 @@ public class AdministracionCuentas extends JInternalFrame {
     }
 
     private void agregarCuenta() {
-        String tipoTransaccion = txtTipoTransaccion.getText();
+        String tipoTransaccion = btnDeposito.isSelected() ? "entrada" : (btnRetiro.isSelected() ? "salida" : "");
+        if (tipoTransaccion.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un tipo de transacción.");
+            return;
+        }
+
         double monto = Double.parseDouble(txtMonto.getText());
         String descripcion = txtDescripcion.getText();
+        LocalDate fechaActual = LocalDate.now();
 
         try (Connection conn = DataBaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("INSERT INTO cuentas (cliente_id, tipo_transaccion, monto, descripcion) VALUES (?, ?, ?, ?)")) {
+             PreparedStatement stmt = conn.prepareStatement("INSERT INTO cuentas (cliente_id, tipo_transaccion, monto, descripcion, fecha) VALUES (?, ?, ?, ?, ?)")) {
 
             stmt.setInt(1, clienteIDSeleccionado);
             stmt.setString(2, tipoTransaccion);
             stmt.setDouble(3, monto);
             stmt.setString(4, descripcion);
+            stmt.setDate(5, java.sql.Date.valueOf(fechaActual));
 
             int filas = stmt.executeUpdate();
             if (filas > 0) {
@@ -134,51 +171,89 @@ public class AdministracionCuentas extends JInternalFrame {
     }
 
     private void realizarTransaccion() {
-        int filaSeleccionada = tablaCuentas.getSelectedRow();
-        if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione una cuenta para realizar la transacción.");
-            return;
-        }
+    String inputCuentaID = JOptionPane.showInputDialog(this, "Ingrese el ID de la cuenta:");
+    if (inputCuentaID == null || inputCuentaID.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Debe ingresar un ID de cuenta.");
+        return;
+    }
 
-        int cuentaID = (int) tablaCuentas.getValueAt(filaSeleccionada, 0);
-        String tipoTransaccion = txtTipoTransaccion.getText();
-        double monto = Double.parseDouble(txtMonto.getText());
+    int cuentaID;
+    try {
+        cuentaID = Integer.parseInt(inputCuentaID);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID de cuenta inválido.");
+        return;
+    }
 
-        try (Connection conn = DataBaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT monto FROM cuentas WHERE cuenta_id = ?")) {
+    String tipoTransaccion = btnDeposito.isSelected() ? "deposito" : (btnRetiro.isSelected() ? "retiro" : "");
+    if (tipoTransaccion.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Debe seleccionar un tipo de transacción.");
+        return;
+    }
 
-            stmt.setInt(1, cuentaID);
-            ResultSet rs = stmt.executeQuery();
+    // Obtener el monto y la descripción de la transacción
+    double montoTransaccion;
+    try {
+        montoTransaccion = Double.parseDouble(txtMonto.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Monto inválido.");
+        return;
+    }
 
-            if (rs.next()) {
-                double saldoActual = rs.getDouble("monto");
+    String descripcionTransaccion = txtDescripcion.getText();
+    if (descripcionTransaccion.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Debe ingresar una descripción.");
+        return;
+    }
 
-                // Realizar la transacción según el tipo
-                if (tipoTransaccion.equalsIgnoreCase("deposito")) {
-                    saldoActual += monto;
-                } else if (tipoTransaccion.equalsIgnoreCase("retiro")) {
-                    if (saldoActual >= monto) {
-                        saldoActual -= monto;
-                    } else {
-                        JOptionPane.showMessageDialog(this, "No hay suficiente saldo.");
-                        return;
-                    }
+    double nuevoMonto = 0;
+
+    // Obtener el monto actual de la cuenta para realizar la operación de la transacción
+    try (Connection conn = DataBaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement("SELECT monto FROM cuentas WHERE cuenta_id = ?")) {
+
+        stmt.setInt(1, cuentaID);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            double montoActual = rs.getDouble("monto");
+
+            // Dependiendo de si es un depósito o un retiro, actualizar el monto
+            if (tipoTransaccion.equals("deposito")) {
+                nuevoMonto = montoActual + montoTransaccion;
+            } else if (tipoTransaccion.equals("retiro")) {
+                if (montoTransaccion > montoActual) {
+                    JOptionPane.showMessageDialog(this, "No hay suficiente saldo para realizar el retiro.");
+                    return;
                 }
+                nuevoMonto = montoActual - montoTransaccion;
+            }
 
-                // Actualizar el monto de la cuenta
-                try (PreparedStatement updateStmt = conn.prepareStatement("UPDATE cuentas SET monto = ? WHERE cuenta_id = ?")) {
-                    updateStmt.setDouble(1, saldoActual);
-                    updateStmt.setInt(2, cuentaID);
-                    int filas = updateStmt.executeUpdate();
+            // Actualizar tanto el monto como la descripción en la base de datos
+            try (PreparedStatement updateStmt = conn.prepareStatement(
+                    "UPDATE cuentas SET monto = ?, descripcion = ? WHERE cuenta_id = ?")) {
 
-                    if (filas > 0) {
-                        JOptionPane.showMessageDialog(this, "Transacción realizada exitosamente.");
-                        cargarCuentasCliente();
-                    }
+                updateStmt.setDouble(1, nuevoMonto);
+                updateStmt.setString(2, descripcionTransaccion);
+                updateStmt.setInt(3, cuentaID);
+                int rowsAffected = updateStmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Transacción realizada exitosamente.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró la cuenta con el ID proporcionado.");
                 }
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al realizar transacción: " + e.getMessage());
+
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró la cuenta con el ID proporcionado.");
         }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al realizar la transacción: " + e.getMessage());
     }
+
+    // Cargar nuevamente las cuentas para actualizar la vista
+    cargarCuentasCliente();
+}
+
 }

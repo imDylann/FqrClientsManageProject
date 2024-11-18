@@ -4,6 +4,11 @@
  */
 package View;
 
+import Model.DAO.ClienteDAO;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author PC
@@ -15,6 +20,7 @@ public class MainView extends javax.swing.JFrame {
      */
     AdministracionClientes viewC;
     public MainView() {
+  
         initComponents();
         this.PanelGay.setEnabled(false);
           this.PanelGay.setVisible(false);
@@ -36,7 +42,7 @@ public class MainView extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        CuentasLbl = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
@@ -91,20 +97,25 @@ public class MainView extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(204, 204, 204));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Cuentas");
+        CuentasLbl.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        CuentasLbl.setForeground(new java.awt.Color(51, 51, 51));
+        CuentasLbl.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        CuentasLbl.setText("Cuentas");
+        CuentasLbl.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CuentasLblMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(CuentasLbl, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+            .addComponent(CuentasLbl, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
         jPanel7.setBackground(new java.awt.Color(204, 204, 204));
@@ -113,6 +124,11 @@ public class MainView extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(51, 51, 51));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Reportes");
+        jLabel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel4MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -227,7 +243,28 @@ public class MainView extends javax.swing.JFrame {
           this.PanelGay.add(viewC);
           viewC.setEnabled(true);
            viewC.setVisible(true);
+           
     }//GEN-LAST:event_jLabel1MouseClicked
+
+    private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
+        // TODO add your handling code here:
+         Reporte r = new Reporte();
+             this.PanelGay.setEnabled(true);
+          this.PanelGay.setVisible(true);
+          this.PanelGay.add(r);
+          r.setEnabled(true);
+           r.setVisible(true);
+    }//GEN-LAST:event_jLabel4MouseClicked
+
+    private void CuentasLblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CuentasLblMouseClicked
+        // TODO add your handling code here:
+          AdministracionCuentas AC= new AdministracionCuentas();
+          this.PanelGay.setEnabled(true);
+          this.PanelGay.setVisible(true);
+          this.PanelGay.add(AC);
+          AC.setEnabled(true);
+           AC.setVisible(true);
+    }//GEN-LAST:event_CuentasLblMouseClicked
 
     /**
      * @param args the command line arguments
@@ -265,15 +302,14 @@ public class MainView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel CuentasLbl;
     private javax.swing.JDesktopPane PanelGay;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
