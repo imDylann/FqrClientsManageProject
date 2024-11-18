@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.awt.Font;
 
+
 public class Reporte extends JInternalFrame {
     private JTextField txtClienteID, txtCuentaID;
     private JButton btnGenerarReporte;
@@ -20,57 +21,67 @@ public class Reporte extends JInternalFrame {
     public Reporte() {
         // Configuración del JInternalFrame
         setTitle("Generar Reporte de Cuenta");
-        setSize(400, 300);
-        setLayout(new BorderLayout());
+        setSize(1320, 750);
+        setLayout(null); // Usar diseño absoluto
         setBackground(new Color(240, 240, 240));
         setClosable(true);
         setIconifiable(true);
 
         // Panel superior con el título
         JPanel panelTitulo = new JPanel();
-        panelTitulo.setBackground(new Color(70, 130, 180)); // Color azul
+        panelTitulo.setBackground(new Color(70, 130, 180));
+        panelTitulo.setBounds(0, 0, 1320, 70);
         JLabel lblTitulo = new JLabel("Generar Reporte de Cuenta");
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 24));
         lblTitulo.setForeground(Color.WHITE);
         panelTitulo.add(lblTitulo);
-        add(panelTitulo, BorderLayout.NORTH);
+        add(panelTitulo);
 
-        // Panel central para el formulario
+        // Panel central para los campos de texto
         JPanel panelCentral = new JPanel();
-        panelCentral.setLayout(new GridLayout(4, 2, 10, 10));
-        panelCentral.setBackground(new Color(240, 240, 240)); // Fondo claro
+        panelCentral.setLayout(null);
+        panelCentral.setBackground(new Color(240, 240, 240));
+        panelCentral.setBounds(50, 100, 1220, 500);
 
         JLabel lblClienteID = new JLabel("ID del Cliente:");
-        lblClienteID.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblClienteID.setFont(new Font("Arial", Font.BOLD, 18));
+        lblClienteID.setBounds(50, 50, 200, 30);
+        panelCentral.add(lblClienteID);
+
         txtClienteID = new JTextField();
+        txtClienteID.setFont(new Font("Arial", Font.PLAIN, 16));
+        txtClienteID.setBounds(250, 50, 300, 30);
+        panelCentral.add(txtClienteID);
 
         JLabel lblCuentaID = new JLabel("ID de la Cuenta:");
-        lblCuentaID.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtCuentaID = new JTextField();
-
-        panelCentral.add(lblClienteID);
-        panelCentral.add(txtClienteID);
+        lblCuentaID.setFont(new Font("Arial", Font.BOLD, 18));
+        lblCuentaID.setBounds(50, 100, 200, 30);
         panelCentral.add(lblCuentaID);
+
+        txtCuentaID = new JTextField();
+        txtCuentaID.setFont(new Font("Arial", Font.PLAIN, 16));
+        txtCuentaID.setBounds(250, 100, 300, 30);
         panelCentral.add(txtCuentaID);
 
-        add(panelCentral, BorderLayout.CENTER);
+        add(panelCentral);
 
         // Panel inferior con el botón
         JPanel panelBoton = new JPanel();
         panelBoton.setBackground(new Color(240, 240, 240));
+        panelBoton.setBounds(0, 650, 1320, 70);
         btnGenerarReporte = new JButton("Generar Reporte");
         btnGenerarReporte.setBackground(new Color(70, 130, 180));
         btnGenerarReporte.setForeground(Color.WHITE);
-        btnGenerarReporte.setFont(new Font("Arial", Font.BOLD, 14));
+        btnGenerarReporte.setFont(new Font("Arial", Font.BOLD, 20));
+        btnGenerarReporte.setFocusPainted(false);
         btnGenerarReporte.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 generarReporte();
             }
         });
-
         panelBoton.add(btnGenerarReporte);
-        add(panelBoton, BorderLayout.SOUTH);
+        add(panelBoton);
     }
 
     private void generarReporte() {
@@ -127,7 +138,7 @@ public class Reporte extends JInternalFrame {
 
             // Información de la empresa
             documento.add(new Paragraph("Nombre de Empresa: Inversiones FQR", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16)));
-            documento.add(new Paragraph("TEL: 85381625"));
+            documento.add(new Paragraph("TEL: 88137450"));
             documento.add(new Paragraph(" "));
 
             // Agregar el nombre del cliente al reporte
@@ -136,7 +147,7 @@ public class Reporte extends JInternalFrame {
 
             // Tabla de registros de cambios
             documento.add(new Paragraph("Registros de Cambios", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-            PdfPTable tabla = new PdfPTable(4); // Ahora tiene cuatro columnas, eliminando la columna "Código Cliente"
+            PdfPTable tabla = new PdfPTable(4); // Ahora tiene cuatro columnas
             tabla.setWidthPercentage(100);
             tabla.addCell("Fecha");
             tabla.addCell("Descripción");
@@ -156,14 +167,12 @@ public class Reporte extends JInternalFrame {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             String fechaGeneracion = sdf.format(new Date());
 
-            // Formatear el saldo con el signo ₡ y separador de miles
             String saldoFormateado = "₡" + String.format("%,d", Math.round(saldoActual));
 
             documento.add(new Paragraph("Saldo Actual: " + saldoFormateado));
             documento.add(new Paragraph("Fecha de Generación: " + fechaGeneracion));
-
-            // Espacio para la firma
             documento.add(new Paragraph(" "));
+
             documento.add(new Paragraph("Firma del encargado: ___________________________"));
 
             documento.close();
